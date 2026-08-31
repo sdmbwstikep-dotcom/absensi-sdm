@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1,
+maximum-scale=1,
+user-scalable=no">
+
+<title>
+Absensi SDM - Kamera
+</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+
+<style>
+
+*{
+box-sizing:border-box;
+}
+
+html,
+body{
+
+margin:0;
+padding:0;
+
+width:100%;
+min-height:100%;
+
+font-family:
+Arial,
+Helvetica,
+sans-serif;
+
+background:#f1f4f7;
+
+color:#222;
+
+}
+
+.header{
+
+background:#980000;
+
+color:white;
+
+text-align:center;
+
+padding:
+18px 12px;
+
+box-shadow:
+0 3px 12px
+rgba(0,0,0,.18);
+
+}
+
+.header h1{
+
+margin:0;
+
+font-size:25px;
+
+}
+
+.header p{
+
+margin:
+6px 0 0;
+
+font-size:14px;
+
+}
+
+.container{
+
+width:100%;
+
+max-width:650px;
+
+margin:auto;
+
+padding:
+15px;
+
+}
+
+.card{
+
+background:white;
+
+border-radius:18px;
+
+padding:18px;
+
+margin-bottom:15px;
+
+box-shadow:
+0 4px 18px
+rgba(0,0,0,.09);
+
+}
+
+.title{
+
+text-align:center;
+
+font-size:20px;
+
+font-weight:bold;
+
+margin-bottom:12px;
+
+}
+
+.info{
+
+text-align:center;
+
+font-size:14px;
+
+color:#667085;
+
+line-height:1.5;
+
+margin-bottom:15px;
+
+}
+
+.camera-box{
+
+position:relative;
+
+width:100%;
+
+aspect-ratio:4/3;
+
+background:#111;
+
+border-radius:16px;
+
+overflow:hidden;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+}
+
+video{
+
+width:100%;
+
+height:100%;
+
+object-fit:cover;
+
+display:block;
+
+transform:
+scaleX(-1);
+
+}
+
+.face-frame{
+
+position:absolute;
+
+width:58%;
+
+height:72%;
+
+border:
+3px solid rgba(255,255,255,.9);
+
+border-radius:45%;
+
+left:21%;
+
+top:14%;
+
+pointer-events:none;
+
+box-shadow:
+0 0 0 9999px
+rgba(0,0,0,.12);
+
+}
+
+.status{
+
+margin-top:14px;
+
+padding:13px;
+
+border-radius:10px;
+
+text-align:center;
+
+font-size:14px;
+
+line-height:1.4;
+
+}
+
+.status.loading{
+
+background:#fff0c2;
+
+color:#705500;
+
+}
+
+.status.success{
+
+background:#d9f5df;
+
+color:#126b2c;
+
+}
+
+.status.error{
+
+background:#ffdcdc;
+
+color:#a00000;
+
+}
+
+.status.info{
+
+background:#e5f0ff;
+
+color:#194b85;
+
+}
+
+.controls{
+
+display:grid;
+
+grid-template-columns:
+1fr 1fr;
+
+gap:10px;
+
+margin-top:15px;
+
+}
+
+button{
+
+border:0;
+
+border-radius:10px;
+
+padding:
+13px 10px;
+
+font-size:15px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+.btn-primary{
+
+background:#980000;
+
+color:white;
+
+}
+
+.btn-green{
+
+background:#16803c;
+
+color:white;
+
+}
+
+.btn-secondary{
+
+background:#e9ecef;
+
+color:#222;
+
+}
+
+button:disabled{
+
+opacity:.5;
+
+cursor:not-allowed;
+
+}
+
+input,
+select{
+
+width:100%;
+
+padding:13px;
+
+font-size:16px;
+
+border:
+1px solid #c9cdd2;
+
+border-radius:9px;
+
+outline:none;
+
+}
+
+input:focus{
+
+border-color:#980000;
+
+}
+
+label{
+
+display:block;
+
+font-weight:bold;
+
+margin:
+8px 0 6px;
+
+}
+
+.employee{
+
+display:none;
+
+background:#f7f8fa;
+
+border-radius:12px;
+
+padding:13px;
+
+margin-top:12px;
+
+}
+
+.employee b{
+
+font-size:17px;
+
+}
+
+.row{
+
+display:flex;
+
+justify-content:space-between;
+
+gap:10px;
+
+padding:
+4px 0;
+
+font-size:14px;
+
+}
+
+.footer{
+
+text-align:center;
+
+font-size:12px;
+
+color:#667085;
+
+padding:
+15px 10px 25px;
+
+}
+
+.spinner{
+
+display:inline-block;
+
+width:15px;
+
+height:15px;
+
+border:
+2px solid #ccc;
+
+border-top-color:#980000;
+
+border-radius:50%;
+
+animation:
+spin .8s linear infinite;
+
+vertical-align:middle;
+
+margin-right:5px;
+
+}
+
+@keyframes spin{
+
+to{
+transform:rotate(360deg);
+}
+
+}
+
+@media(
+max-width:480px
+){
+
+.header h1{
+
+font-size:21px;
+
+}
+
+.container{
+
+padding:
+10px;
+
+}
+
+.card{
+
+padding:
+14px;
+
+}
+
+.camera-box{
+
+aspect-ratio:3/4;
+
+}
+
+.face-frame{
+
+width:65%;
+
+height:55%;
+
+left:17.5%;
+
+top:22.5%;
+
+}
+
+.controls{
+
+grid-template-columns:
+1fr;
+
+}
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+<h1>
+ABSENSI SDM
+</h1>
+
+<p>
+Bawaslu Kota Tidore Kepulauan
+</p>
+
+</div>
+
+
+<div class="container">
+
+
+<!-- =================================================
+     MODE
+================================================= -->
+
+<div class="card">
+
+<div class="title">
+📷 Absensi Wajah
+</div>
+
+<div
+id="modeText"
+class="info"
+>
+Menyiapkan kamera...
+</div>
+
+
+<label>
+NIP / NIK Pegawai
+</label>
+
+<input
+id="nip"
+type="text"
+placeholder="Masukkan NIP/NIK"
+autocomplete="off"
+>
+
+
+<div
+id="employee"
+class="employee"
+>
+
+<div class="row">
+
+<span>Nama</span>
+
+<b id="employeeName">
+-
+</b>
+
+</div>
+
+
+<div class="row">
+
+<span>Jabatan</span>
+
+<span id="employeeJabatan">
+-
+</span>
+
+</div>
+
+
+<div class="row">
+
+<span>Unit Kerja</span>
+
+<span id="employeeUnit">
+-
+</span>
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<!-- =================================================
+     CAMERA
+================================================= -->
+
+<div class="card">
+
+<div class="camera-box">
+
+<video
+id="video"
+autoplay
+muted
+playsinline
+></video>
+
+<div class="face-frame"></div>
+
+</div>
+
+
+<div
+id="status"
+class="status loading"
+>
+
+<span class="spinner"></span>
+
+Menyiapkan sistem kamera...
+
+</div>
+
+
+<div class="controls">
+
+<button
+id="btnMasuk"
+class="btn-green"
+onclick="processAttendance('MASUK')"
+disabled
+>
+
+✓ ABSEN MASUK
+
+</button>
+
+
+<button
+id="btnPulang"
+class="btn-primary"
+onclick="processAttendance('PULANG')"
+disabled
+>
+
+↪ ABSEN PULANG
+
+</button>
+
+</div>
+
+</div>
+
+
+
+<!-- =================================================
+     REGISTER FACE
+================================================= -->
+
+<div
+id="registerCard"
+class="card"
+style="display:none;"
+>
+
+<div class="title">
+🔐 Registrasi Face ID
+</div>
+
+<div class="info">
+
+Pastikan wajah berada di tengah
+bingkai dan pencahayaan cukup.
+
+</div>
+
+
+<button
+id="btnRegister"
+class="btn-primary"
+onclick="registerFace()"
+disabled
+>
+
+DAFTARKAN WAJAH
+
+</button>
+
+</div>
+
+
+
+<!-- =================================================
+     FOOTER
+================================================= -->
+
+<div class="footer">
+
+Sistem Absensi SDM<br>
+
+Bawaslu Kota Tidore Kepulauan
+
+</div>
+
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   KONFIGURASI
+===================================================== */
+
+var API_URL =
+'https://script.google.com/macros/s/AKfycbxO97It0vd-zPX-Qhz322uVxjgdmRHj0w5po0qGgLnJ9SpDHvlhHXv1iEP8YjUumgw/exec';
+
+
+var MODEL_URL =
+'https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.15/model';
+
+
+var video =
+document.getElementById(
+'video'
+);
+
+
+var mode =
+new URLSearchParams(
+window.location.search
+)
+.get('mode') ||
+'attendance';
+
+
+var nipFromURL =
+new URLSearchParams(
+window.location.search
+)
+.get('nip') ||
+'';
+
+
+var modelsReady =
+false;
+
+
+var cameraReady =
+false;
+
+
+var processing =
+false;
+
+
+/* =====================================================
+   START
+===================================================== */
+
+window.addEventListener(
+'load',
+function(){
+
+initialize();
+
+});
+
+
+async function initialize(){
+
+try{
+
+if(
+mode === 'register'
+){
+
+document
+.getElementById(
+'modeText'
+)
+.innerHTML =
+'Mode registrasi Face ID';
+
+document
+.getElementById(
+'registerCard'
+)
+.style
+.display =
+'block';
+
+if(
+nipFromURL
+){
+
+document
+.getElementById(
+'nip'
+)
+.value =
+nipFromURL;
+
+}
+
+}
+else{
+
+document
+.getElementById(
+'modeText'
+)
+.innerHTML =
+'Masukkan NIP/NIK kemudian posisikan wajah di tengah kamera.';
+
+}
+
+
+setStatus(
+'Memuat sistem pengenalan wajah...',
+'loading'
+);
+
+
+await loadModels();
+
+
+modelsReady =
+true;
+
+
+setStatus(
+'Model wajah berhasil dimuat. Membuka kamera...',
+'info'
+);
+
+
+await startCamera();
+
+
+cameraReady =
+true;
+
+
+if(
+mode === 'register'
+){
+
+document
+.getElementById(
+'btnRegister'
+)
+.disabled =
+false;
+
+}
+
+else{
+
+document
+.getElementById(
+'btnMasuk'
+)
+.disabled =
+false;
+
+document
+.getElementById(
+'btnPulang'
+)
+.disabled =
+false;
+
+}
+
+
+if(
+nipFromURL
+){
+
+findEmployee();
+
+}
+
+
+setStatus(
+'Kamera siap. Posisikan satu wajah di tengah bingkai.',
+'success'
+);
+
+}
+
+catch(error){
+
+console.error(error);
+
+setStatus(
+getCameraErrorMessage(error),
+'error'
+);
+
+}
+
+}
+
+
+/* =====================================================
+   LOAD MODELS
+===================================================== */
+
+async function loadModels(){
+
+await Promise.all([
+
+faceapi.nets.tinyFaceDetector.loadFromUri(
+MODEL_URL
+),
+
+faceapi.nets.faceLandmark68Net.loadFromUri(
+MODEL_URL
+),
+
+faceapi.nets.faceRecognitionNet.loadFromUri(
+MODEL_URL
+)
+
+]);
+
+}
+
+
+/* =====================================================
+   CAMERA
+===================================================== */
+
+async function startCamera(){
+
+if(
+!navigator.mediaDevices ||
+!navigator.mediaDevices.getUserMedia
+){
+
+throw new Error(
+'Browser tidak mendukung kamera.'
+);
+
+}
+
+
+var stream =
+await navigator.mediaDevices.getUserMedia({
+
+video:{
+
+facingMode:{
+ideal:'user'
+},
+
+width:{
+ideal:1280
+},
+
+height:{
+ideal:720
+}
+
+},
+
+audio:false
+
+});
+
+
+video.srcObject =
+stream;
+
+
+await new Promise(
+function(resolve){
+
+video.onloadedmetadata =
+function(){
+
+video.play();
+
+resolve();
+
+};
+
+});
+
+
+}
+
+
+/* =====================================================
+   CAMERA ERROR
+===================================================== */
+
+function getCameraErrorMessage(error){
+
+if(
+error &&
+error.name ===
+'NotAllowedError'
+){
+
+return 'Akses kamera ditolak oleh browser. Izinkan kamera untuk alamat GitHub Pages ini kemudian muat ulang halaman.';
+
+}
+
+if(
+error &&
+error.name ===
+'NotFoundError'
+){
+
+return 'Kamera tidak ditemukan pada perangkat ini.';
+
+}
+
+if(
+error &&
+error.name ===
+'NotReadableError'
+){
+
+return 'Kamera sedang digunakan aplikasi lain. Tutup aplikasi kamera lain lalu coba kembali.';
+
+}
+
+if(
+location.protocol !==
+'https:'
+&&
+location.hostname !==
+'localhost'
+){
+
+return 'Kamera membutuhkan HTTPS. Pastikan halaman dibuka melalui alamat GitHub Pages.';
+
+}
+
+return 'Kamera belum dapat digunakan: ' +
+(
+error &&
+error.message
+?
+error.message
+:
+'Silakan periksa izin kamera.'
+);
+
+}
+
+
+/* =====================================================
+   FIND EMPLOYEE
+===================================================== */
+
+var nipTimer = null;
+
+
+document
+.getElementById(
+'nip'
+)
+.addEventListener(
+'input',
+function(){
+
+clearTimeout(
+nipTimer
+);
+
+var value =
+this.value.trim();
+
+
+document
+.getElementById(
+'employee'
+)
+.style
+.display =
+'none';
+
+
+if(
+value.length < 3
+){
+
+return;
+
+}
+
+
+nipTimer =
+setTimeout(
+function(){
+
+findEmployee();
+
+},
+500
+);
+
+});
+
+
+function findEmployee(){
+
+var nip =
+document
+.getElementById(
+'nip'
+)
+.value
+.trim();
+
+
+if(
+!nip
+){
+
+return;
+
+}
+
+
+setStatus(
+'Mencari data pegawai...',
+'loading'
+);
+
+
+jsonp(
+'employee',
+{
+
+nip:nip
+
+},
+
+function(result){
+
+if(
+result &&
+result.success
+){
+
+document
+.getElementById(
+'employeeName'
+)
+.textContent =
+result.data.nama;
+
+
+document
+.getElementById(
+'employeeJabatan'
+)
+.textContent =
+result.data.jabatan ||
+'-';
+
+
+document
+.getElementById(
+'employeeUnit'
+)
+.textContent =
+result.data.unit ||
+'-';
+
+
+document
+.getElementById(
+'employee'
+)
+.style
+.display =
+'block';
+
+
+if(
+mode === 'register'
+){
+
+setStatus(
+'Pegawai ditemukan. Posisikan wajah untuk registrasi.',
+'success'
+);
+
+}
+else{
+
+setStatus(
+'Pegawai ditemukan. Posisikan wajah di tengah bingkai.',
+'success'
+);
+
+}
+
+}
+
+else{
+
+setStatus(
+result.message ||
+'Pegawai tidak ditemukan.',
+'error'
+);
+
+}
+
+});
+
+}
+
+
+/* =====================================================
+   GET FACE DESCRIPTOR
+===================================================== */
+
+async function getFaceDescriptor(){
+
+if(
+!modelsReady
+){
+
+throw new Error(
+'Model wajah belum siap.'
+);
+
+}
+
+
+if(
+!cameraReady
+){
+
+throw new Error(
+'Kamera belum siap.'
+);
+
+}
+
+
+var detections =
+await faceapi
+.detectAllFaces(
+video,
+new faceapi.TinyFaceDetectorOptions({
+inputSize:320,
+scoreThreshold:0.5
+})
+.withFaceLandmarks()
+.withFaceDescriptors();
+
+
+if(
+!detections ||
+detections.length === 0
+){
+
+throw new Error(
+'Tidak ada wajah terdeteksi. Posisikan wajah di tengah kamera.'
+);
+
+}
+
+
+if(
+detections.length > 1
+){
+
+throw new Error(
+'Terdeteksi lebih dari satu wajah. Hanya satu orang yang boleh berada di depan kamera.'
+);
+
+}
+
+
+var descriptor =
+detections[0]
+.descriptor;
+
+
+return Array
+.from(descriptor)
+.map(
+function(value){
+
+return Number(
+value.toFixed(8)
+);
+
+});
+
+}
+
+
+/* =====================================================
+   REGISTER FACE
+===================================================== */
+
+async function registerFace(){
+
+if(
+processing
+){
+
+return;
+
+}
+
+
+var nip =
+document
+.getElementById(
+'nip'
+)
+.value
+.trim();
+
+
+if(
+!nip
+){
+
+setStatus(
+'Masukkan NIP/NIK pegawai terlebih dahulu.',
+'error'
+);
+
+return;
+
+}
+
+
+processing =
+true;
+
+
+document
+.getElementById(
+'btnRegister'
+)
+.disabled =
+true;
+
+
+try{
+
+setStatus(
+'Mendeteksi wajah...',
+'loading'
+);
+
+
+var descriptor =
+await getFaceDescriptor();
+
+
+setStatus(
+'Menyimpan Face ID...',
+'loading'
+);
+
+
+jsonp(
+'registerface',
+{
+
+nip:nip,
+
+descriptor:
+JSON.stringify(
+descriptor
+)
+
+},
+
+function(result){
+
+processing =
+false;
+
+
+document
+.getElementById(
+'btnRegister'
+)
+.disabled =
+false;
+
+
+if(
+result &&
+result.success
+){
+
+setStatus(
+'✓ Face ID berhasil didaftarkan untuk ' +
+result.nama,
+'success'
+);
+
+}
+else{
+
+setStatus(
+result.message ||
+'Registrasi Face ID gagal.',
+'error'
+);
+
+}
+
+});
+
+}
+
+catch(error){
+
+processing =
+false;
+
+document
+.getElementById(
+'btnRegister'
+)
+.disabled =
+false;
+
+setStatus(
+error.message,
+'error'
+);
+
+}
+
+}
+
+
+/* =====================================================
+   ABSENSI
+===================================================== */
+
+async function processAttendance(
+jenis
+){
+
+if(
+processing
+){
+
+return;
+
+}
+
+
+var nip =
+document
+.getElementById(
+'nip'
+)
+.value
+.trim();
+
+
+if(
+!nip
+){
+
+setStatus(
+'Masukkan NIP/NIK pegawai terlebih dahulu.',
+'error'
+);
+
+document
+.getElementById(
+'nip'
+)
+.focus();
+
+return;
+
+}
+
+
+processing =
+true;
+
+
+document
+.getElementById(
+'btnMasuk'
+)
+.disabled =
+true;
+
+document
+.getElementById(
+'btnPulang'
+)
+.disabled =
+true;
+
+
+try{
+
+setStatus(
+'Memindai wajah...',
+'loading'
+);
+
+
+var descriptor =
+await getFaceDescriptor();
+
+
+setStatus(
+'Memverifikasi wajah...',
+'loading'
+);
+
+
+jsonp(
+'verify',
+{
+
+nip:nip,
+
+jenis:jenis,
+
+descriptor:
+JSON.stringify(
+descriptor
+)
+
+},
+
+function(result){
+
+processing =
+false;
+
+
+document
+.getElementById(
+'btnMasuk'
+)
+.disabled =
+false;
+
+document
+.getElementById(
+'btnPulang'
+)
+.disabled =
+false;
+
+
+if(
+result &&
+result.success
+){
+
+setStatus(
+
+'✓ ABSENSI BERHASIL<br>' +
+
+'<b>' +
+escapeHtml(
+result.nama
+) +
+'</b><br>' +
+
+result.jenis +
+' — ' +
+result.jam,
+
+'success'
+
+);
+
+}
+
+else{
+
+setStatus(
+result.message ||
+'Absensi gagal.',
+'error'
+);
+
+}
+
+});
+
+}
+
+catch(error){
+
+processing =
+false;
+
+document
+.getElementById(
+'btnMasuk'
+)
+.disabled =
+false;
+
+document
+.getElementById(
+'btnPulang'
+)
+.disabled =
+false;
+
+
+setStatus(
+error.message,
+'error'
+);
+
+}
+
+}
+
+
+/* =====================================================
+   JSONP
+===================================================== */
+
+function jsonp(
+action,
+params,
+callback
+){
+
+var callbackName =
+'callback_' +
+Date.now() +
+'_' +
+Math.floor(
+Math.random()*100000
+);
+
+
+var script =
+document.createElement(
+'script'
+);
+
+
+var query =
+'?action=' +
+encodeURIComponent(
+action
+) +
+
+'&callback=' +
+encodeURIComponent(
+callbackName
+);
+
+
+for(
+var key in params
+){
+
+if(
+params.hasOwnProperty(key)
+){
+
+query +=
+'&' +
+encodeURIComponent(key) +
+'=' +
+encodeURIComponent(
+params[key]
+);
+
+}
+
+}
+
+
+window[callbackName] =
+function(data){
+
+try{
+
+callback(data);
+
+}
+
+finally{
+
+delete window[
+callbackName
+];
+
+if(
+script.parentNode
+){
+
+script
+.parentNode
+.removeChild(
+script
+);
+
+}
+
+}
+
+};
+
+
+script.onerror =
+function(){
+
+delete window[
+callbackName
+];
+
+if(
+script.parentNode
+){
+
+script
+.parentNode
+.removeChild(
+script
+);
+
+}
+
+setStatus(
+'Gagal terhubung ke server absensi.',
+'error'
+);
+
+};
+
+
+script.src =
+API_URL +
+query;
+
+
+document
+.body
+.appendChild(
+script
+);
+
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(
+message,
+type
+){
+
+var el =
+document
+.getElementById(
+'status'
+);
+
+
+el.className =
+'status ' +
+type;
+
+
+el.innerHTML =
+message;
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(
+text
+){
+
+return String(
+text === null ||
+text === undefined
+?
+''
+:
+text
+)
+
+.replace(
+/&/g,
+'&amp;'
+)
+
+.replace(
+/</g,
+'&lt;'
+)
+
+.replace(
+/>/g,
+'&gt;'
+)
+
+.replace(
+/"/g,
+'&quot;'
+)
+
+.replace(
+/'/g,
+'&#039;'
+);
+
+}
+
+
+/* =====================================================
+   STOP CAMERA WHEN LEAVING
+===================================================== */
+
+window.addEventListener(
+'beforeunload',
+function(){
+
+if(
+video.srcObject
+){
+
+var tracks =
+video.srcObject
+.getTracks();
+
+
+for(
+var i=0;
+i<tracks.length;
+i++
+){
+
+tracks[i].stop();
+
+}
+
+}
+
+});
+
+</script>
+
+</body>
+
+</html>
